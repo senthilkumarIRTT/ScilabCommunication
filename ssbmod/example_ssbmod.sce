@@ -1,9 +1,9 @@
-Fs =20;
+Fs =200;
 t = [0:2*Fs+1]'/Fs;
 ini_phase =0;
 Fc = 50;//try fc=100, 1000 
-x =0.5*(sin(2*%pi*t)+sin(4*%pi*t)); 
-y = ammod(x,Fc,Fs,ini_phase);
+x =sin(2*%pi*t); 
+y = ssbmod(x,Fc,Fs,ini_phase,'upper');
 
 
 

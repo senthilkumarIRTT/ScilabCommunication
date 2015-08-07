@@ -1,16 +1,17 @@
-function [y] = ammod(x,Fc,Fs,varargin)
-//Amplitude Modulation
+function [y] = ssbmod(x,Fc,Fs,varargin)
+//SSBMOD Single Sideband amplitude modulation
 
-//Y=ammod(x,Fc,Fs)
-//The function modulates the signal x with a carrier of frequency Fc(Hz) sampled at the rate Fs(Hz).
+//Y=ssbmod(x,Fc,Fs)
+//It amplitude modulates signal x with carrier frequency Fc(Hz) and at a sampling frequency Fs(Hz).
+//Default sideband is the lower band.
 
-//Y=ammod(X,Fc,Fs,INI_PHASE) 
+//Y=ssbmod(x,Fc,Fs,INI_PHASE) 
 //The function adds the INI_PHASE(radians) to the modulated signal.
 
-//Y=ammod(X,Fc,Fs,INI_PHASE, CARRAMP) 
-//The function provides transmitted carrier modulation with amplitude CARRAMP.
+//Y=ssbmod(x,Fc,Fs,INI_PHASE, 'upper') 
+//The function uses the upper sideband.
 
-//Fs must satisfy Fs>2*(Fc+BW), BW is the bandwidth of x. 
+//Fs must satisfy Fs>2*(Fc+BW), BW is the bandwidth of x.
 
 //Written by Maitreyee Mordekar, FOSSEE, IIT Bombay.
 
@@ -49,32 +50,36 @@ if rr>=4
   	end;
 end;
 
-//Check for CARRAMP
-carr_amp=0;
+//Check for METHOD
+Method='';
 if rr==5 then
-  	carr_amp= varargin(2);
-  	if(~isreal(carr_amp) | ~(length(carr_amp))==1 ) then
-    		error("CARRAMP must be a real scalar.");
-	else
-		carr_amp=0;	
- 	 end;
+	Method=varargin(2)
+	disp(Method)
+	if (strcmpi(Method, 'upper')) then
+		error('String argument must be upper.');
+	end;
 end;
 
 //Check if x is one dimensional
 wid=size(x,1);
 if wid==1
 	x=x(:);
-end
+end;
 
 //Modulation
-t = (0:1/Fs:(size(x,1)-1)/Fs)'
+t = (0:1/Fs:(size(x,1)-1)/Fs)';
 t = t(:,ones(1,size(x,2)));
-y = (carr_amp + x).*cos(2*%pi*Fc*t + ini_phase);
+
+if ~strcmpi(Method, 'upper')
+	y=x.*cos(2*%pi*Fc*t+ini_phase)-imag(hilbert(x)).*sin(2*%pi*Fc*t+ini_phase);
+else
+	y=x.*cos(2*%pi*Fc*t+ini_phase)+imag(hilbert(x)).*sin(2*%pi*Fc*t+ini_phase);
+end;
 
 //Restore the output to original orientation
-if(wid ==1)
+if wid==1
 	y=y';
-end
+end;
 
 endfunction
 
