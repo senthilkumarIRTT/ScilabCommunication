@@ -1,7 +1,7 @@
 function [y] = freqmod(x,Fc,Fs,freqdev,varargin)
 //Frequency Modulation
 
-//Y=fmmod(x,Fc,Fs,FREQDEV)
+//Y=freqdemod(x,Fc,Fs,FREQDEV)
 //It frequency modulates signal x with carrier frequency Fc(Hz) and at a sampling frequency Fs(Hz).
 //FREQDEV(Hz) is the frequency deviation of the modulated signal
 
