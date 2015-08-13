@@ -6,4 +6,5 @@ Fs = 32;      // Sample rate (Hz)
 x=[1 2 3 0 2 3 1];
 
 y = fskmod(x,M,freqsep,nsamp,Fs);
-disp(y)
+z= fskdemod(y,M,freqsep,nsamp,Fs);
+disp(z)

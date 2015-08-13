@@ -102,7 +102,7 @@ end;
 if (rr>=4 & rr<=6) then
     sym_ord="bin";
 else
-    sym_ord=vararg(3);
+    sym_ord=varargin(3);
     if (~(strcmpi(sym_ord,"bin")) & ~(strcmpi(sym_ord,"gray"))) then
         error("Invalid symbol ordering");
     end;
@@ -176,6 +176,179 @@ end;
 
 endfunction
 
+
+//----------------------------------------------------------------------------------------------------------------------------
+
 function [out]=rem(in1, in2)
+//Remainder after division
+//output is the remainder after in1 is divided by in2
     out=in1-fix(in1./in2).*in2;
+endfunction
+
+//----------------------------------------------------------------------------------------------------------------------------
+
+function [z] = fskdemod(y,M,freq_sep,nSamp,varargin)
+//FSKDEMOD Frequency shift keying demodulation
+//   Z = FSKDEMOD(Y,M,FREQ_SEP,NSAMP) noncoherently demodulates the complex
+//   envelope Y of a signal using the frequency shift keying method.  
+//   M is the size of the alphabet(Has to be 2^integer).  
+//   The output Z will have value from 0 to M-1.  
+//   FREQ_SEP is the desired separation between successive frequencies, in Hz.  
+//   NSAMP denotes the number of samples per symbol.  
+//   If the signal is two dimensional, each column is treated as a channel.
+//
+//   Y = FSKDEMOD(X,M,FREQ_SEP,NSAMP,FS) specifies the sampling frequency (Hz).
+// 
+
+//   Y = FSKDEMOD(X,M,FREQ_SEP,NSAMP,Fs,SYMBOL_ORDER) specifies how 
+//   the function assigns binary words to corresponding integers. 
+//   Ordering could be 'bin' binary or 'gray' gray coded 
+
+//Written by Maitreyee Mordekar, FOSSEE, IIT Bombay.
+
+//Check number of arguments
+[ll,rr] = argn(0)
+funcprot(0);
+
+if rr<4 then
+	error("Too few input arguments.");
+end;
+
+if rr>6 then
+	error("Too many input arguments.");
+end;
+
+//Check for M
+if (~isreal(M) | (ceil(M)~=M) | M<=0) then
+    error("M must be a scalar positive integer.");
+end;
+
+//Check that M is of the form 2^K
+if ((ceil(log2(M)) ~= log2(M))) then
+    error("M must be a power of 2.");
+end;
+
+//Check that the FREQ_SEP is greater than 0
+if (~isreal(freq_sep) | ~(length(freq_sep))==1 | freq_sep<=0)     
+    error("FREQ_SEP must be a scalar greater than 0.");
+end;
+
+//Check that NSAMP is an integer greater than 1
+if ((ceil(nSamp) ~= nSamp) | (nSamp <= 1))
+    error("NSAMP must be an integer greater than 1.");
+end;
+
+//Check for Fs
+if rr>=5 then
+    Fs=varargin(1);
+    if (isempty(Fs)) then
+        Fs=1;
+    elseif (~isreal(Fs) | ~length(Fs)==1 | Fs<=0) then
+        error("Fc must be a real, positive scalar.");
+    end;
+else
+    Fs=1;
+end;
+
+samp_time=1/Fs;
+
+//Check that the maximum frequency is not greater than Fs/2
+max_freq = ((M-1)/2)*freq_sep;
+if (max_freq > Fs/2) then
+    error("The maximum frequency must be less than or equal to Fs/2.");
+end;
+
+//Symbol order
+if (rr==4 | rr==5) then
+    sym_ord="bin";
+else
+    sym_ord=varargin(2);
+    if (~(strcmpi(sym_ord,"bin")) & ~(strcmpi(sym_ord,"gray"))) then
+        error("Invalid symbol ordering");
+    end;
+end;
+
+//Check if x is one dimensional
+wid=size(x,1);
+if wid==1
+	x=x(:);
+end;
+
+
+//Obtain the total number of channels
+[nRows, nChan] = size(x);
+
+// Preallocate memory
+z = zeros(nRows/nSamp, nChan);
+
+// Define the frequencies used for the demodulator.  
+freqs = [-(M-1)/2 : (M-1)/2] * freq_sep;
+
+// Use the frequencies to generate M complex tones which will be multiplied with
+// each received FSK symbol.  The tones run down the columnns of the "tones"
+// matrix.
+t = [0 : samp_time : (nSamp*samp_time) - samp_time]';
+phase = 2*%pi*t*freqs;
+tones = exp(-%i*phase);
+
+
+// For each FSK channel, multiply the complex received signal with the M complex
+// tones.  Then perform an integrate and dump over each symbol period, find the
+// magnitude, and choose the transmitted symbol corresponding to the maximum
+// magnitude.
+for iChan = 1 : nChan       // loop for each FSK channel
+    
+    for iSym = 1 : nRows/nSamp
+        
+        // Load the samples for the current symbol
+        yTemp = y( (iSym-1)*nSamp+1 : iSym*nSamp, iChan);
+        
+        // Replicate the received FSK signal to multiply with the M tones
+        yTemp = yTemp(:, ones(M,1));
+
+        // Multiply against the M tones
+        yTemp = yTemp .* tones;
+
+        // Perform the integrate and dump, then get the magnitude.  Use a
+        // subfunction for the integrate and dump, to omit the error checking.
+        yMag = abs(intanddump(yTemp, nSamp));
+
+        // Choose the maximum and assign an integer value to it.  Subtract 1 from the
+        // output of MAX because the integer outputs are zero-based, not one-based.
+        [maxVal maxIdx] = max(yMag, [], 2);
+
+        z(iSym,iChan) = maxIdx - 1;
+        
+     end;
+end;
+
+// Restore the output signal to the original orientation
+if(wid == 1)
+    z = z';
+end
+endfunction 
+
+//----------------------------------------------------------------------------------------------------------------------------
+
+function [y] = intanddump(x, Nsamp)
+//INTANDDUMP Integrate and dump.
+//   Y = INTANDDUMP(X, NSAMP) integrates the signal X for 1 symbol period, then
+//   outputs one value into Y. NSAMP is the number of samples per symbol.
+//   For two-dimensional signals, the function treats each column as 1
+//   channel.
+
+// Assure that X, if one dimensional, has the correct orientation 
+wid = size(x,1);
+if(wid ==1)
+    x = x(:);
+end
+
+[xRow, xCol] = size(x);
+x = mean(reshape(x, Nsamp, xRow*xCol/Nsamp), 1);
+y = matrix(x, xRow/Nsamp, xCol);      
+
+//restore the output signal to the original orientation 
+if(wid == 1)
+    y = y.';
+end
 endfunction
