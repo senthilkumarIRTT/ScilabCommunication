@@ -1,3 +1,5 @@
+//Written by Manas Ranjan Das, FOSSEE, IIT Bombay.
+
 Fs =200;
 t = [0:Fs]'/Fs;
 ini_phase =0;

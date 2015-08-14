@@ -1,3 +1,5 @@
+//    Written by Maitreyee Mordekar, FOSSEE, IIT Bombay.
+
 M = 4;        // Modulation order
 freqsep = 8;  // Frequency separation (Hz)
 nsamp = 8;    // Number of samples per symbol

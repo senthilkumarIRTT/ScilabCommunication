@@ -19,7 +19,7 @@ function y = fskmod(x,M,freq_sep,nSamp,varargin)
 //   the function assigns binary words to corresponding integers. 
 //   Ordering could be 'bin' binary or 'gray' gray coded 
 
-//Written by Maitreyee Mordekar, FOSSEE, IIT Bombay.
+//   Written by Maitreyee Mordekar, FOSSEE, IIT Bombay.
 
 [ll,rr] = argn(0)
 funcprot(0);
@@ -328,7 +328,7 @@ end
 endfunction 
 
 //----------------------------------------------------------------------------------------------------------------------------
-
+//Added as a standalone function intdump(x,Nsamp)
 function [y] = intanddump(x, Nsamp)
 //INTANDDUMP Integrate and dump.
 //   Y = INTANDDUMP(X, NSAMP) integrates the signal X for 1 symbol period, then

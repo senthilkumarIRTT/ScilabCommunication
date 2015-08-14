@@ -1,3 +1,4 @@
+//Written by Maitreyee Mordekar, FOSSEE, IIT Bombay.
 Fs =200;
 t = [0:2*Fs+1]'/Fs;
 ini_phase =0;
