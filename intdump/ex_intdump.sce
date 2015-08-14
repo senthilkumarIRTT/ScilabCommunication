@@ -2,7 +2,7 @@
 
 nSamp=4;
 
-in=[1:8];
+in=[1:3;2:4;3:5;0:2];
 disp("The input sequence is=")
 disp(in)
 

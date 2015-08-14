@@ -23,8 +23,14 @@ if(wid ==1)
 end
 
 // Nsamp must be an integer factor of the number of samples in the received signal.
-if( rem(length(x), Nsamp) ~=0 )
-    error("Number of elements in each channel of X must be an integer multiple of NSAMP.");
+if(wid==1)  then
+    if( rem(length(x), Nsamp) ~=0 )
+        error("Number of elements in each channel of X must be an integer multiple of NSAMP.");
+    end
+else
+     if( rem(wid, Nsamp) ~=0 )
+        error("Number of elements in each channel of X must be an integer multiple of NSAMP.");
+    end
 end
 
 
