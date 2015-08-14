@@ -197,10 +197,10 @@ function [z] = fskdemod(y,M,freq_sep,nSamp,varargin)
 //   NSAMP denotes the number of samples per symbol.  
 //   If the signal is two dimensional, each column is treated as a channel.
 //
-//   Y = FSKDEMOD(X,M,FREQ_SEP,NSAMP,FS) specifies the sampling frequency (Hz).
+//   Z = FSKDEMOD(X,M,FREQ_SEP,NSAMP,FS) specifies the sampling frequency (Hz).
 // 
 
-//   Y = FSKDEMOD(X,M,FREQ_SEP,NSAMP,Fs,SYMBOL_ORDER) specifies how 
+//   Z = FSKDEMOD(X,M,FREQ_SEP,NSAMP,Fs,SYMBOL_ORDER) specifies how 
 //   the function assigns binary words to corresponding integers. 
 //   Ordering could be 'bin' binary or 'gray' gray coded 
 
