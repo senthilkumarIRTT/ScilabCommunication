@@ -44,17 +44,17 @@ if rr>=4
 	ini_phase=varargin(1);
 	if isempty(ini_phase)
 		ini_phase=0;
-  	elseif(~isreal(ini_phase) | ~(length(ini_phase))==1 ) 
-    		error("INI_PHASE must be a real scalar.");
-  	end;
+            elseif(~isreal(ini_phase) | ~(length(ini_phase))==1 ) 
+                        error("INI_PHASE must be a real scalar.");
+              end;
 end;
 
 //Check for CARRAMP
 carr_amp=0;
 if rr==5 then
-  	carr_amp= varargin(2);
+              carr_amp= varargin(2);
   	if(~isreal(carr_amp) | ~(length(carr_amp))==1 ) then
-    		error("CARRAMP must be a real scalar.");
+                    error("CARRAMP must be a real scalar.");
 	else
 		carr_amp=0;	
  	 end;
@@ -78,4 +78,12 @@ end
 
 endfunction
 
-
+function [y] = prime(x)
+    y=0;
+    for i = 2:(x-1)
+         if(modulo(x,i)==0) then
+             y=1;
+         break;
+     end; 
+end
+endfunction
