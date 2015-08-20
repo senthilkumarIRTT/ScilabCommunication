@@ -25,7 +25,7 @@ end
 [m1,n1]=size(A);
 [m2,n2]=size(B);
 
-//Zero padding on rows
+//Checking dimension compatibility
 if (m1~=m2 | n1~=n2) then
     error("The dimensions of the two inputs have to match");
 end
