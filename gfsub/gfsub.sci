@@ -11,7 +11,7 @@ function [y] = gfsub(A,B,varargin)
     //If one of the two inputs is shorter than the other, than zero padding is done to the shorter number to
     //make the two elements of equal length.
     
-    //GFSUB(A,B,P,LENGTH) returns the same result as in GFADD(A,B,P) but truncated to length LENGTH.
+    //GFSUB(A,B,P,LENGTH) returns the same result as in GFSUB(A,B,P) but truncated to length LENGTH.
         
     //Written by Maitreyee Mordekar, FOSSEE, IIT Bombay.
     
