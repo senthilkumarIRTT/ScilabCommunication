@@ -36,8 +36,8 @@ function [y] = gfmul(A,B,varargin)
         P=varargin(1);
         if isempty(P) then
                 P=2;
-        elseif(~isreal(P) | ~(length(P))==1 | ~prime(P)) 
-                error("P must be a real prime number.");
+        elseif(~isreal(P) | ~(length(P))==1 | ~prime(P) | floor(P)~=P) 
+                error("The field parameter P must be a positive prime integer.");
         end;
     end;
 
