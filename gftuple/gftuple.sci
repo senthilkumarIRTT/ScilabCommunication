@@ -57,23 +57,24 @@ function [y] = gftuple(A,varargin)
           end
     end
 
-    //Error checking for A
-    if (isempty(A) | ndims(A) > 2)
-            error("The form of A is invalid.")
-    end
+//    //Error checking for A
+//    if (isempty(A) | ndims(A) > 2)
+//            error("The form of A is invalid.")
+//    end
     [m_A, n_A]=size(A);
-    if n_A==1 then
-            if any(any(floor(A)~=A | real(A)~=A))
-                y=(floor(A)~=A | real(A)~=A)
-                disp(y)
-                    error("If input A is a column vector, then its entries must be real integers.");
-            end
-    else
-            if any(any(abs(A)~=A | floor(A)~=A))
-                    error("If input A is a matrix, then its entries must be real positive integers.");
-            end
-    end
-    
+//    if n_A==1 then
+//            if any(any(~floor_compare(A) | ~real_check(A)))
+//                y=(floor(A)~=A | real(A)~=A)
+//                y_a=(~floor_compare(A) | ~real_check(A))
+//                disp(y_a)
+//                    error("If input A is a column vector, then its entries must be real integers.");
+//            end
+//    else
+//            if any(any(abs(A)~=A | floor(A)~=A))
+//                    error("If input A is a matrix, then its entries must be real positive integers.");
+//            end
+//    end
+//    
     //Error checking of further parameters
     prim_poly = varargin(1);
     [m_pp, n_pp] = size(prim_poly);
@@ -169,3 +170,13 @@ function [y]=any(x)
           end
    end
 endfunction
+
+//----------------------------------------------------------------------FLOOR COMPARE----------------------------------------------------------------------------------------------------------
+function [y]=floor_compare(x)
+    z=(floor(x)==x);
+    if (z)
+          y=1;
+    else
+          y=0;
+    end;
+endfunction  
