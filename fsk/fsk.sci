@@ -83,10 +83,11 @@ if (max_freq > Fs/2) then
     error("The maximum frequency must be less than or equal to Fs/2.");
 end;
 
+phase="cont";
 //Check if the phase is continuous or discontinuous
 if rr>=6 then
-    phase=varargin(2);
-    if (~strcmpi(phase,"cont") | ~strcmpi(phase,"discont")) then
+    phase=varargin(2)
+    if (strcmpi(phase,"cont") & strcmpi(phase,"discont")) then
         error("PHASE should be cont or discont ");
     end;
 else
@@ -99,11 +100,13 @@ else
     phase_cont = 0;
 end;
 
+
+sym_ord="bin";
 if (rr>=4 & rr<=6) then
     sym_ord="bin";
 else
     sym_ord=varargin(3);
-    if (~(strcmpi(sym_ord,"bin")) & ~(strcmpi(sym_ord,"gray"))) then
+    if ((strcmpi(sym_ord,"bin")) & (strcmpi(sym_ord,"gray"))) then
         error("Invalid symbol ordering");
     end;
 end;
@@ -114,6 +117,13 @@ if wid==1
 	x=x(:);
 end;
 
+//Gray encoding
+if (~strcmpi(sym_ord,'gray'))
+    disp("gray coded")
+    [x_gray,gray_map] = bin2grayfsk(x,M); 
+    index=ismember(x,gray_map);
+     x=index-1;
+end
 
 //Obtain the total number of channels
 [nRows, nChan] = size(x);
@@ -158,7 +168,7 @@ else
             // large.
             if (~phase_cont)
                 //need to run the rem.sci file
-                OscPhase(iChan,:)=rem(OscPhase(iChan,:) + phIncrSym + phIncrSamp, 2*pi);
+                OscPhase(iChan,:)=rem(OscPhase(iChan,:) + phIncrSym + phIncrSamp, 2*%pi);
             end;
 
             // If in continuous mode, the starting phase for the next symbol is the
@@ -274,7 +284,6 @@ if wid==1
 	y=y(:);
 end;
 
-
 //Obtain the total number of channels
 [nRows, nChan] = size(y);
 
@@ -290,7 +299,6 @@ freqs = [-(M-1)/2 : (M-1)/2] * freq_sep;
 t = [0 : samp_time : (nSamp*samp_time) - samp_time]';
 phase = 2*%pi*t*freqs;
 tones = exp(-%i*phase);
-
 
 // For each FSK channel, multiply the complex received signal with the M complex
 // tones.  Then perform an integrate and dump over each symbol period, find the
@@ -321,6 +329,13 @@ for iChan = 1 : nChan       // loop for each FSK channel
        end;
 end;
 
+// Gray decode if necessary
+if (~strcmpi(sym_ord,'gray'))
+    disp("gray decoded")
+    [z_degray,gray_map] = gray2binfsk(z,M); 
+    z = gray_map(z+1);
+end
+
 // Restore the output signal to the original orientation
 if(wid == 1)
     z = z';
@@ -328,6 +343,7 @@ end
 endfunction 
 
 //----------------------------------------------------------------------------------------------------------------------------
+
 //Added as a standalone function intdump(x,Nsamp)
 function [y] = intanddump(x, Nsamp)
 //INTANDDUMP Integrate and dump.
@@ -350,4 +366,53 @@ y = matrix(x, xRow/Nsamp, xCol);
 if(wid == 1)
     y = y.';
 end
+endfunction
+
+//-------------------------------------------------------------------------------------------------------------------------------
+
+function [output, mapping] = bin2grayfsk(x, order)
+//Convert a binary number to a gray number for fsk        
+
+        //Calculate Gray table
+        num = (0:order-1)';
+        binary_num =dec2bin(j);
+        for i=1:(order)
+            shifted = floor(2^(-1)*num(i));
+            mapping(i)=bitxor(shifted,num(i));
+        end
+
+        // Format output and translate x (map) i.e. convert to Gray
+        for j=1:order
+            temp=mapping(j)+1;
+            output(j)=x(temp);
+        end
+        
+        // Assure that the output, if one dimensional and has the correct orientation
+        wid = size(x,1);
+        if(wid == 1)
+            output = output';
+        end
+       
+endfunction
+//----------------------------------------------------------------------------------------------------------------------------------
+
+function [a] = ismember(x, y)
+    for i=1:length(x)
+        index(i)=find(y(:)==x(i))
+    end
+    a=index;
+endfunction
+
+//----------------------------------------------------------------------------------------------------------------------------------
+
+function [output, mapping]=gray2binfsk(x, order)
+        //Calculate Gray table
+        num = (0:order-1)';
+        binary_num =dec2bin(j);
+        for i=1:(order)
+            shifted = floor(2^(-1)*num(i));
+            mapping(i)=bitxor(shifted,num(i));
+        end
+        index=ismember(x,mapping);
+        output=index-1;
 endfunction
