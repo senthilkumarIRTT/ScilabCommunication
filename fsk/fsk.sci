@@ -19,7 +19,7 @@ function y = fskmod(x,M,freq_sep,nSamp,varargin)
 //   the function assigns binary words to corresponding integers. 
 //   Ordering could be 'bin' binary or 'gray' gray coded 
 
-//Written by Maitreyee Mordekar, FOSSEE, IIT Bombay.
+//   Written by Maitreyee Mordekar, FOSSEE, IIT Bombay.
 
 [ll,rr] = argn(0)
 funcprot(0);
@@ -197,10 +197,10 @@ function [z] = fskdemod(y,M,freq_sep,nSamp,varargin)
 //   NSAMP denotes the number of samples per symbol.  
 //   If the signal is two dimensional, each column is treated as a channel.
 //
-//   Y = FSKDEMOD(X,M,FREQ_SEP,NSAMP,FS) specifies the sampling frequency (Hz).
+//   Z = FSKDEMOD(Y,M,FREQ_SEP,NSAMP,FS) specifies the sampling frequency (Hz).
 // 
 
-//   Y = FSKDEMOD(X,M,FREQ_SEP,NSAMP,Fs,SYMBOL_ORDER) specifies how 
+//   Z = FSKDEMOD(Y,M,FREQ_SEP,NSAMP,Fs,SYMBOL_ORDER) specifies how 
 //   the function assigns binary words to corresponding integers. 
 //   Ordering could be 'bin' binary or 'gray' gray coded 
 
@@ -229,7 +229,7 @@ if ((ceil(log2(M)) ~= log2(M))) then
 end;
 
 //Check that the FREQ_SEP is greater than 0
-if (~isreal(freq_sep) | ~(length(freq_sep))==1 | freq_sep<=0)     
+if (~isreal(freq_sep) | ~(length(freq_sep)==1) | freq_sep<=0)     
     error("FREQ_SEP must be a scalar greater than 0.");
 end;
 
@@ -243,7 +243,7 @@ if rr>=5 then
     Fs=varargin(1);
     if (isempty(Fs)) then
         Fs=1;
-    elseif (~isreal(Fs) | ~length(Fs)==1 | Fs<=0) then
+    elseif (~isreal(Fs) | ~(length(Fs)==1) | Fs<=0) then
         error("Fc must be a real, positive scalar.");
     end;
 else
@@ -268,15 +268,15 @@ else
     end;
 end;
 
-//Check if x is one dimensional
-wid=size(x,1);
+//Check if y is one dimensional
+wid=size(y,1);
 if wid==1
-	x=x(:);
+	y=y(:);
 end;
 
 
 //Obtain the total number of channels
-[nRows, nChan] = size(x);
+[nRows, nChan] = size(y);
 
 // Preallocate memory
 z = zeros(nRows/nSamp, nChan);
@@ -312,14 +312,13 @@ for iChan = 1 : nChan       // loop for each FSK channel
         // Perform the integrate and dump, then get the magnitude.  Use a
         // subfunction for the integrate and dump, to omit the error checking.
         yMag = abs(intanddump(yTemp, nSamp));
-
         // Choose the maximum and assign an integer value to it.  Subtract 1 from the
         // output of MAX because the integer outputs are zero-based, not one-based.
-        [maxVal maxIdx] = max(yMag, [], 2);
-
-        z(iSym,iChan) = maxIdx - 1;
+        [maxVal, maxIdx] = max(yMag, 'c');
+        maxIdx=maxIdx.';
+        z(iSym, iChan) = (maxIdx - 1);
         
-     end;
+       end;
 end;
 
 // Restore the output signal to the original orientation
@@ -329,7 +328,7 @@ end
 endfunction 
 
 //----------------------------------------------------------------------------------------------------------------------------
-
+//Added as a standalone function intdump(x,Nsamp)
 function [y] = intanddump(x, Nsamp)
 //INTANDDUMP Integrate and dump.
 //   Y = INTANDDUMP(X, NSAMP) integrates the signal X for 1 symbol period, then
@@ -344,7 +343,7 @@ if(wid ==1)
 end
 
 [xRow, xCol] = size(x);
-x = mean(reshape(x, Nsamp, xRow*xCol/Nsamp), 1);
+x = mean(matrix(x, Nsamp, xRow*xCol/Nsamp), 'r');
 y = matrix(x, xRow/Nsamp, xCol);      
 
 //restore the output signal to the original orientation 

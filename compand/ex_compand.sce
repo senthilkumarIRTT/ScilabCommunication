@@ -1,3 +1,4 @@
+//Written by Maitreyee Mordekar, FOSSEE, IIT Bombay.
 
 //Mu-law
 in=[1 2 3 4 5];
