@@ -1,7 +1,7 @@
 function [y] = intrlv(x, elements)
 //INTRLV Reorder sequence of symbols.
 
-//INTRLVED = INTRLV(X, ELEMENTS) rearranges the elements of  X without repeating or omitting any of its elements. 
+//Y= INTRLV(X, ELEMENTS) rearranges the elements of  X without repeating or omitting any of its elements. 
 //If X has N elements, for each integer k between 1 and N, ELEMENTS must have non-repeated integers between 1 and N.
 //ELEMENTS indicates the indices of in which order the output Y appear.
 //It determines the order of arrangement of x.
