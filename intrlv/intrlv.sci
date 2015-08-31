@@ -52,10 +52,10 @@ if (~isempty(zero_location))
     error(" ELEMENTS must be a permutation of the indices of the elements in input ");
 end
 
-//Permutes sequence of symbols given in DATA
+//Permutes sequence of symbols given in X
 y = x(elements(:),:);                    
 
-//Restores the output to the original orientation if sequence in DATA is a column vector
+//Restores the output to the original orientation if sequence in X is a column vector
 if (initial_width == 1)
    y = y';
 end
