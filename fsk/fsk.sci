@@ -375,7 +375,7 @@ function [output, mapping] = bin2grayfsk(x, order)
 
         //Calculate Gray table
         num = (0:order-1)';
-        binary_num =dec2bin(j);
+        binary_num =dec2bin(x);
         for i=1:(order)
             shifted = floor(2^(-1)*num(i));
             mapping(i)=bitxor(shifted,num(i));
@@ -408,7 +408,7 @@ endfunction
 function [output, mapping]=gray2binfsk(x, order)
         //Calculate Gray table
         num = (0:order-1)';
-        binary_num =dec2bin(j);
+        binary_num =dec2bin(x);
         for i=1:(order)
             shifted = floor(2^(-1)*num(i));
             mapping(i)=bitxor(shifted,num(i));
